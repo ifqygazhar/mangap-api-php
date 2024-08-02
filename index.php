@@ -18,7 +18,7 @@ use Tuupola\Middleware\CorsMiddleware;
 $app = AppFactory::create();
 
 
-app->add(new CorsMiddleware([
+$app->add(new CorsMiddleware([
     "origin" => ["*"], // Allows all origins. You can restrict this to specific domains.
     "methods" => ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     "headers.allow" => ["Content-Type", "Authorization"],
@@ -209,11 +209,20 @@ $app->get('/read/{url:.*}', function (Request $req, Response $res, array $args) 
             $element = $crawler->filter('#content > .wrapper');
             $title = null;
             $panel = [];
-            $prevChapter = $element->filter('.chapter_nav-control > .right-control > .nextprev > a[rel="prev"]')->attr('href');
-            $nextChapter = $element->filter('.chapter_nav-control > .right-control > .nextprev > a[rel="next"]')->attr('href');
+            $prevChapter = null;
+            $nextChapter = null;
 
-            $prevChapter = $prevChapter ? trim(str_replace("{$baseUrl}/chapter", "", $prevChapter)) : null;
-            $nextChapter = $nextChapter ? trim(str_replace("{$baseUrl}/chapter", "", $nextChapter)) : null;
+            // Check for previous chapter
+            $prevChapterElement = $element->filter('.chapter_nav-control > .right-control > .nextprev > a[rel="prev"]');
+            if ($prevChapterElement->count() > 0) {
+                $prevChapter = trim(str_replace("{$baseUrl}/chapter", "", $prevChapterElement->attr('href')));
+            }
+
+            // Check for next chapter
+            $nextChapterElement = $element->filter('.chapter_nav-control > .right-control > .nextprev > a[rel="next"]');
+            if ($nextChapterElement->count() > 0) {
+                $nextChapter = trim(str_replace("{$baseUrl}/chapter", "", $nextChapterElement->attr('href')));
+            }
 
             $title = trim($element->filter('.chapter_headpost > h1')->text());
             $element->filter('.chapter_ > #chapter_body > .main-reading-area > img')->each(function ($node) use (&$panel) {
@@ -227,11 +236,16 @@ $app->get('/read/{url:.*}', function (Request $req, Response $res, array $args) 
                 'panel' => $panel,
             ];
 
+            // Logging for debugging
+            error_log("Fetched chapter: $url, Title: $title, Prev: $prevChapter, Next: $nextChapter");
+
             return responseApi($res, 200, "success", $komikList);
         }
 
         return responseApi($res, $response->getStatusCode(), "failed");
     } catch (Exception $e) {
+        // Logging the exception
+        error_log("Exception occurred: " . $e->getMessage());
         return responseApi($res, 500, $e->getMessage());
     }
 });
