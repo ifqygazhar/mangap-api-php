@@ -41,3 +41,5 @@ Homestead.json
 *.swp
 *.swo
 
+# Cache
+/cache/

@@ -19,7 +19,7 @@ $app = AppFactory::create();
 
 
 $app->add(new CorsMiddleware([
-    "origin" => ["*"], // Allows all origins. You can restrict this to specific domains.
+    "origin" => ["*"], 
     "methods" => ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     "headers.allow" => ["Content-Type", "Authorization"],
     "headers.expose" => ["Authorization"],
@@ -308,22 +308,23 @@ $app->get('/detail/{url:.*}', function (Request $req, Response $res, array $args
         $crawler = new Crawler($html);
         $element = $crawler->filter("#content > .wrapper > .komik_info");
 
-        $title = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > h1")->text());
-        $altTitle = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-native")->text());
-        $thumbnail = $element->filter(".komik_info-cover-box > .komik_info-cover-image > img")->attr('src') ?? $element->filter(".komik_info-cover-box > .komik_info-cover-image > img")->attr('data-src');
-        $description = trim($element->filter(".komik_info-description > .komik_info-description-sinopsis > p")->text());
-        $status = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(3)")->text());
-        $type = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(4)")->text());
-        $released = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(1)")->text());
-        $author = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(2)")->text());
-        $updatedOn = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > .komik_info-content-update")->text());
-        $rating = trim($element->filter(".komik_info-body > .komik_info-content > .komik_info-content-rating > .komik_info-content-rating-bungkus > .data-rating > strong")->text());
+        // Gunakan conditional checks untuk menangani elemen yang mungkin tidak ada
+        $title = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > h1")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > h1")->text() : "-";
+        $altTitle = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-native")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-native")->text() : "-";
+        $thumbnail = $element->filter(".komik_info-cover-box > .komik_info-cover-image > img")->count() ? $element->filter(".komik_info-cover-box > .komik_info-cover-image > img")->attr('src') : "-";
+        $description = $element->filter(".komik_info-description > .komik_info-description-sinopsis > p")->count() ? $element->filter(".komik_info-description > .komik_info-description-sinopsis > p")->text() : "-";
+        $status = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(3)")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(3)")->text() : "-";
+        $type = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(4)")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(4)")->text() : "-";
+        $released = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(1)")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(1)")->text() : "-";
+        $author = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(2)")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > span:nth-child(2)")->text() : "-";
+        $updatedOn = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > .komik_info-content-update")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-body > .komik_info-content-meta > .komik_info-content-update")->text() : "-";
+        $rating = $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-rating > .komik_info-content-rating-bungkus > .data-rating > strong")->count() ? $element->filter(".komik_info-body > .komik_info-content > .komik_info-content-rating > .komik_info-content-rating-bungkus > .data-rating > strong")->text() : "-";
 
         $chapters = [];
         $element->filter(".komik_info-body > .komik_info-chapters > ul > li")->each(function ($node) use (&$chapters, $baseUrl) {
             $title = trim($node->filter("a")->text());
-            $href = $node->filter("a")->attr('href') ?? $node->filter("a:nth-child(2)")->attr('href');
-            $date = trim($node->filter(".chapter-link-time")->text());
+            $href = $node->filter("a")->count() ? $node->filter("a")->attr('href') : $node->filter("a:nth-child(2)")->attr('href');
+            $date = $node->filter(".chapter-link-time")->count() ? trim($node->filter(".chapter-link-time")->text()) : 'Unknown Date';
             $chapters[] = [
                 'title' => "Chapter " . trim(str_replace("Chapter", "", $title)),
                 'href' => trim(str_replace("{$baseUrl}/chapter", "", $href)),
@@ -340,8 +341,8 @@ $app->get('/detail/{url:.*}', function (Request $req, Response $res, array $args
         });
 
         $komikList[] = [
-            'title' => $title,
-            'altTitle' => $altTitle,
+            'title' => trim($title),
+            'altTitle' => trim($altTitle),
             'updatedOn' => trim(str_replace("Updated on:", "", $updatedOn)),
             'rating' => trim(str_replace("Rating ", "", $rating)),
             'status' => trim(str_replace("Status:", "", $status)),
@@ -349,14 +350,18 @@ $app->get('/detail/{url:.*}', function (Request $req, Response $res, array $args
             'released' => trim(str_replace("Released:", "", $released)),
             'author' => trim(str_replace("Author:", "", $author)),
             'genre' => $genres,
-            'description' => $description,
+            'description' => trim($description),
             'thumbnail' => $thumbnail,
             'chapter' => $chapters
         ];
 
         return responseApi($res, 200, "success", $komikList[0]);
     } catch (Exception $e) {
-        return responseApi($res, 500, $e->getMessage());
+        if ($e->getCode() === 404) {
+            return responseApi($res, 404, "comic not found");
+        }
+        error_log("Exception: " . $e->getMessage());
+        return responseApi($res, 500, "failed");
     }
 });
 
@@ -501,5 +506,5 @@ $app->get('/daftar-komik/{page}', function (Request $req, Response $res, array $
 
 
 
-return $app;
+$app->run();
 
