@@ -4,6 +4,10 @@
 
 **BASE URL** = localhost:8000 
 
+## Setup Cache For Views If you want
+
+Just create cache folder in root folder project.
+
 ## Recommended Comic
 
 ``` markdown
