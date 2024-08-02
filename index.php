@@ -501,5 +501,5 @@ $app->get('/daftar-komik/{page}', function (Request $req, Response $res, array $
 
 
 
-$app->run();
+return $app;
 
