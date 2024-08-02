@@ -11,8 +11,21 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Slim\Views\Twig;
 use Slim\Views\TwigMiddleware;
 use Twig\Loader\FilesystemLoader;
+use Tuupola\Middleware\CorsMiddleware;
+
+
 
 $app = AppFactory::create();
+
+
+app->add(new CorsMiddleware([
+    "origin" => ["*"], // Allows all origins. You can restrict this to specific domains.
+    "methods" => ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    "headers.allow" => ["Content-Type", "Authorization"],
+    "headers.expose" => ["Authorization"],
+    "headers.max_age" => 86400,
+    "credentials" => true
+]));
 
 $baseUrl = "https://komikcast.cz";
 
@@ -22,6 +35,8 @@ $twig = new Twig($loader, [
 ]);
 
 $app->add(TwigMiddleware::create($app, $twig));
+
+
 
 $app->get('/', function ($request, $response, $args) use ($twig) {
     return $twig->render($response, 'home.html');
