@@ -127,8 +127,36 @@
         </code></pre>
 
         <h3>List Comic</h3>
-        <pre><code>/daftar-komik/:page</code><button class="copy-button" onclick="copyToClipboard(this, '/daftar-komik/:page')">Copy</button></pre>
-        <p>example : <a target="_blank" href="https://facebook.69dev.id/daftar-komik/1">https://facebook.69dev.id/daftar-komik/1</a></p>
+<pre><code>/daftar-komik/:page</code><button class="copy-button" onclick="copyToClipboard(this, '/daftar-komik/:page')">Copy</button></pre>
+<p>example : <a target="_blank" href="https://facebook.69dev.id/daftar-komik/1">https://facebook.69dev.id/daftar-komik/1</a></p>
+<pre><code>
+{
+  "status": "success",
+  "message": "success",
+  "data": {
+    "comics": [
+      {
+        "title": "Absolute Necromancer",
+        "chapter": "Ch.62",
+        "type": "Manhwa",
+        "thumbnail": "https://komikcast.cz/wp-content/uploads/2024/03/absolute.jpeg?w=225&q=50",
+        "rating": "7.00",
+        "href": "/absolute-necromancer/"
+      },
+      {
+        "title": "Magic Emperor",
+        "chapter": "Ch.579",
+        "type": "Manhua",
+        "thumbnail": "https://komikcast.cz/wp-content/uploads/2019/10/magic-emperor.jpg?w=225&q=50",
+        "rating": "8.00",
+        "href": "/magic-emperor/"
+      }
+    ],
+    "halaman": []
+  }
+}
+</code></pre>
+
 
         <h3>Detail Comic</h3>
         <pre><code>/detail/[endpoint]</code><button class="copy-button" onclick="copyToClipboard(this, '/detail/[endpoint]')">Copy</button></pre>
