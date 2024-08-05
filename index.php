@@ -160,10 +160,11 @@ $app->get('/genres/{genre}/{page}', function (Request $req, Response $res, array
             $crawler = new Crawler($html);
             $element = $crawler->filter('#content > .wrapper > .postbody > .bixbox');
 
-            $checkPagination = trim($element->filter('.listupd > .list-update_items > .pagination > .current')->text());
+            // Check if pagination exists
+            $checkPagination = $element->filter('.listupd > .list-update_items > .pagination > .current')->count() ? trim($element->filter('.listupd > .list-update_items > .pagination > .current')->text()) : '1';
 
             $paginationItems = $element->filter('.pagination > .page-numbers');
-            $length_page = trim($paginationItems->eq($paginationItems->count() - 2)->text());
+            $length_page = $paginationItems->count() ? trim($paginationItems->eq($paginationItems->count() - 2)->text()) : '1';
 
             $element->filter('.listupd > .list-update_items > .list-update_items-wrapper > .list-update_item')->each(function ($node) use (&$komikList, $baseUrl) {
                 $title = trim($node->filter('a > .list-update_item-info > h3')->text());
@@ -184,8 +185,8 @@ $app->get('/genres/{genre}/{page}', function (Request $req, Response $res, array
             });
 
             return responseApi($res, 200, "success", [
-                'current_page' => $checkPagination === "" ? 1 : (int) $checkPagination,
-                'length_page' => $length_page === "" ? 1 : (int) $length_page,
+                'current_page' => (int) $checkPagination,
+                'length_page' => (int) $length_page,
                 'data' => $komikList,
             ]);
         }
